@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.1.0/color/618x618/1F3AB.png">
 <style>
   body { font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif; background: #fdf6ec; color: #4a3f35; text-align: center; padding: 24px 16px; margin: 0; }
-  h1 { font-size: clamp(1.18rem, 6.2vw, 1.5rem); margin: 8px 0 4px; line-height: 1.35; word-break: keep-all; }
-  .sub { font-size: 0.9em; color: #8a7a68; margin-bottom: 20px; }
+  h1 { font-size: clamp(0.98rem, 5.3vw, 1.5rem); margin: 8px 0 4px; line-height: 1.35; white-space: nowrap; }
+  .sub { font-size: 0.9em; color: #8a7a68; margin-bottom: 20px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
   .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 480px; margin: 0 auto; padding: 24px 20px; min-height: 260px; }
   .slip { font-size: 1.05em; color: #b7793f; font-weight: bold; margin-bottom: 6px; }
   .circuit { font-family: "Courier New", monospace; background: #1a1a1a; color: #ff5a3c; border-radius: 10px; padding: 12px 8px; font-size: clamp(1.3rem, 9vw, 2rem); font-weight: bold; letter-spacing: 0.12em; margin: 10px 0 4px; text-shadow: 0 0 8px rgba(255,90,60,0.7); }
@@ -33,7 +33,7 @@
   button { background: #d9a441; color: #fff; border: none; border-radius: 999px; font-size: 1.1em; padding: 14px 32px; margin-top: 20px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
   button:active { transform: scale(0.97); }
   button:disabled { opacity: 0.6; }
-  .note { max-width: 480px; margin: 16px auto 0; font-size: 0.8em; color: #8a7a68; line-height: 1.6; }
+  .note { max-width: 480px; margin: 16px auto 0; font-size: 0.8em; color: #8a7a68; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
   .panel { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 480px; margin: 20px auto 0; padding: 18px 20px; text-align: left; box-sizing: border-box; }
   .panel h2 { font-size: 1.1em; margin: 0 0 10px; text-align: center; }
   .panel .empty { font-size: 0.9em; color: #8a7a68; text-align: center; margin: 0; }
@@ -76,7 +76,7 @@
 </head>
 <body>
   <h1>🎫 タイムスリップ行き先きっぷ 🎫</h1>
-  <p class="sub">あなたは今から、どの時代へ行く？ 行き先と、その時代の映画のセット</p>
+  <p class="sub">あなたは今から、どの時代へ行く？<br>行き先と、その時代の映画のセット</p>
 
   <div class="tabs">
     <button id="tabTicket" class="tab-btn active" type="button">🎫 きっぷ</button>
