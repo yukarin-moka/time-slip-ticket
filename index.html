@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タイムスリップ行き先きっぷ</title>
+<style>
+  body { font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif; background: #fdf6ec; color: #4a3f35; text-align: center; padding: 24px 16px; margin: 0; }
+  h1 { font-size: 1.5em; margin: 8px 0 4px; }
+  .sub { font-size: 0.9em; color: #8a7a68; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 480px; margin: 0 auto; padding: 24px 20px; min-height: 260px; }
+  .slip { font-size: 1.05em; color: #b7793f; font-weight: bold; margin-bottom: 6px; }
+  .circuit { font-family: "Courier New", monospace; background: #1a1a1a; color: #ff5a3c; border-radius: 10px; padding: 12px 8px; font-size: 2em; font-weight: bold; letter-spacing: 0.12em; margin: 10px 0 4px; text-shadow: 0 0 8px rgba(255,90,60,0.7); }
+  .circuit-label { font-size: 0.72em; color: #8a7a68; letter-spacing: 0.3em; margin-bottom: 2px; }
+  .dest { font-size: 1.45em; font-weight: bold; margin: 6px 0; line-height: 1.4; }
+  .kind { display: inline-block; font-size: 0.78em; background: #d9a441; color: #fff; border-radius: 999px; padding: 2px 10px; margin-bottom: 6px; }
+  .memo { font-size: 0.98em; line-height: 1.7; text-align: left; background: #fff8e6; border-radius: 10px; padding: 10px 12px; margin: 12px 0; }
+  .mission { font-size: 0.95em; line-height: 1.7; text-align: left; background: #eef7ee; border-radius: 10px; padding: 10px 12px; margin: 12px 0; }
+  .mission.special { background: #fdf3d7; border: 1px dashed #d9a441; }
+  .film { margin-top: 14px; border-top: 1px dashed #d9c9a8; padding-top: 12px; }
+  .filmtitle { font-size: 1.15em; font-weight: bold; }
+  .year { color: #8a7a68; font-size: 0.9em; }
+  .services { margin: 10px 0; font-size: 0.92em; background: #fdf6ec; border-radius: 10px; padding: 8px; }
+  .comment { font-size: 0.95em; line-height: 1.7; text-align: left; }
+  button { background: #d9a441; color: #fff; border: none; border-radius: 999px; font-size: 1.1em; padding: 14px 32px; margin-top: 20px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.6; }
+  .note { max-width: 480px; margin: 16px auto 0; font-size: 0.8em; color: #8a7a68; line-height: 1.6; }
+  .panel { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 480px; margin: 20px auto 0; padding: 18px 20px; text-align: left; box-sizing: border-box; }
+  .panel h2 { font-size: 1.1em; margin: 0 0 10px; text-align: center; }
+  .panel .empty { font-size: 0.9em; color: #8a7a68; text-align: center; margin: 0; }
+  #travelLog { list-style: none; margin: 0; padding: 0; font-size: 0.95em; line-height: 1.9; }
+  .progress { font-size: 0.95em; text-align: center; margin: 0 0 10px; font-weight: bold; color: #b7793f; line-height: 1.6; }
+  .collection-list { list-style: none; margin: 0; padding: 0; font-size: 0.92em; line-height: 1.5; }
+  .collection-list li { padding: 6px 4px; border-bottom: 1px dashed #eee0c8; display: flex; justify-content: space-between; gap: 8px; }
+  .collection-list li.got { color: #4a3f35; }
+  .collection-list li.miss { color: #c4b49c; }
+  .collection-list .c-title { font-size: 0.85em; color: #8a7a68; text-align: right; flex-shrink: 0; }
+  .collection-list li.miss .c-title { color: #c4b49c; }
+  .toggle-btn { background: #8a7a68; font-size: 0.95em; padding: 10px 24px; margin-top: 20px; }
+  .small-btn { background: #fff; color: #b7793f; border: 1.5px solid #d9a441; font-size: 0.85em; padding: 8px 18px; margin-top: 14px; box-shadow: none; }
+
+  .tabs { display: flex; gap: 8px; justify-content: center; margin: 0 auto 18px; max-width: 480px; }
+  .tab-btn { background: #fff; color: #8a7a68; border: 1.5px solid #d9c9a8; font-size: 1em; padding: 10px 22px; margin-top: 0; box-shadow: none; flex: 1; }
+  .tab-btn.active { background: #d9a441; color: #fff; border-color: #d9a441; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  .accident { font-size: 0.95em; line-height: 1.7; text-align: left; background: #fdecea; border: 1.5px solid #e5533c; color: #b3352a; border-radius: 10px; padding: 10px 12px; margin: 12px 0; font-weight: bold; }
+  .souvenir-get { font-size: 0.95em; line-height: 1.7; text-align: left; background: #fdeeda; border-radius: 10px; padding: 10px 12px; margin: 12px 0; }
+  .panel .save-note { font-size: 0.78em; color: #8a7a68; text-align: center; margin: 10px 0 0; line-height: 1.6; }
+
+  .stamp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 8px; margin: 0; padding: 0; list-style: none; }
+  .stamp { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; }
+  .stamp-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.85em; background: #fff8e6; border: 3px solid #f0c979; box-shadow: inset 0 0 0 3px #fff, 0 1px 4px rgba(0,0,0,0.08); box-sizing: border-box; }
+  .stamp.miss .stamp-circle { background: #f4f0ea; border-color: #ddd3c2; color: #c4b49c; font-size: 1.35em; }
+  .stamp-name { font-size: 0.72em; line-height: 1.35; color: #4a3f35; word-break: break-all; }
+  .stamp.miss .stamp-name { color: #c4b49c; }
+  .result-stamp { width: 74px; height: 74px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.3em; background: #fff8e6; border: 3.5px solid #f0c979; box-shadow: inset 0 0 0 3.5px #fff, 0 2px 6px rgba(0,0,0,0.1); margin: 2px auto 8px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+  <h1>🎫 タイムスリップ行き先きっぷ 🎫</h1>
+  <p class="sub">あなたは今から、どの時代へ行く？ 行き先と、その時代の映画のセット</p>
+
+  <div class="tabs">
+    <button id="tabTicket" class="tab-btn active" type="button">🎫 きっぷ</button>
+    <button id="tabCollection" class="tab-btn" type="button">📖 コレクション</button>
+  </div>
+
+  <div id="tabTicketView">
+
+  <div class="card" id="card">
+    <div class="slip">まずはボタンを押してみてね</div>
+    <div class="dest">？？？</div>
+    <div class="comment" style="text-align:center;">行き先は、押してからのお楽しみ</div>
+  </div>
+  <button id="draw" type="button">タイムスリップする</button>
+
+  <p class="note">このきっぷは配信にこだわらない版。一部の作品は2026年11月10日時点の見放題情報を載せているけど、配信状況は変動するので、観る前に各サービスで確認してね。</p>
+  </div>
+
+  <div id="tabCollectionView" style="display:none;">
+  <div class="panel" id="logPanel" style="margin-top:0;">
+    <h2>🧳 旅の記録</h2>
+    <p class="empty" id="travelLogEmpty">まだ旅に出ていないよ。ボタンを押して出発しよう。</p>
+    <ul id="travelLog"></ul>
+  </div>
+
+  <div class="panel" id="collectionPanel">
+    <h2>📖 コレクション帳</h2>
+    <p class="progress" id="collectionProgress"></p>
+    <ul class="stamp-grid" id="collectionList"></ul>
+    <p class="save-note">コレクションとお土産はこの端末・ブラウザに保存されるよ。</p>
+    <div style="text-align:center;">
+      <button id="collectionReset" class="small-btn" type="button">コレクションとお土産をリセット</button>
+    </div>
+  </div>
+
+  <div class="panel" id="souvenirPanel">
+    <h2>🎁 お土産棚</h2>
+    <p class="progress" id="souvenirProgress"></p>
+    <ul class="stamp-grid" id="souvenirList"></ul>
+    <p class="save-note">お土産は行き先を引くたびに1つずつ増えるよ。リセットはコレクション帳のボタンから。</p>
+  </div>
+  </div>
+
+<script>
+const trips = [
+  { emoji: "🕰️", kind: "タイムスリップ", yearDisp: "1955", dest: "1955年のヒルバレー", memo: "現地メモ：若き日の両親がいる時代。写真の家族が消えかけたら要注意。ロックンロールはまだ新しい音楽だよ。", mission: "🎁 お土産ミッション：帰る前に、誰かの恋のきっかけをひとつ作ってくること。", souvenir: "時計台保存会のチラシ", title: "バック・トゥ・ザ・フューチャー", year: "1985年", services: "Hulu／U-NEXT／Amazonプライムビデオ", comment: "タイムスリップ映画の出発点。デロリアンと一緒に、まずはここから。何度観てもワクワクするよ。" },
+  { emoji: "🛹", kind: "タイムスリップ", yearDisp: "2015", dest: "2015年の未来", memo: "現地メモ：ホバーボードと自動で閉まる靴の時代。スポーツ年鑑は、悪い人の手に渡さないこと。", mission: "🎁 お土産ミッション：未来の自分にバレないように、そっと帰ってくること。", souvenir: "スポーツ年鑑のレプリカ", title: "バック・トゥ・ザ・フューチャー PART2", year: "1989年", services: "Hulu／U-NEXT／Amazonプライムビデオ", comment: "2015年の未来と、変わってしまった1985年を行ったり来たり。PART1を観た次の日にどうぞ。" },
+  { emoji: "🚂", kind: "タイムスリップ", yearDisp: "1885", dest: "1885年の西部開拓時代", memo: "現地メモ：電車と蒸気機関車の時代。酒場では無用な争いを避けて。帰りの燃料は、現地調達が基本だよ。", mission: "🎁 お土産ミッション：機関車に乗って、夕日をバックに帰ってくること。", souvenir: "ヒルバレー駅の記念きっぷ", title: "バック・トゥ・ザ・フューチャー PART3", year: "1990年", services: "U-NEXT（見放題）", comment: "三部作の締めくくりは、ほっこりとカッコいい西部劇。Hulu・Primeは時期により変動するので、観る前に確認してね。" },
+  { emoji: "🍮", kind: "タイムリープ", yearDisp: "2006", dest: "何度でもやり直せる夏休み", memo: "現地メモ：移動距離は数日分だけ。でも回数は無制限（のはず）。プリンの食べ過ぎと、告白のタイミングに注意。", mission: "🎁 お土産ミッション：やり直しは使わず、一発勝負で大事な事を伝えてくること。", souvenir: "タイムリープの種（クルミ型のお守り）", title: "時をかける少女", year: "2006年", services: "Netflix／Hulu／Amazonプライムビデオ", comment: "何度でもやり直せる、はずだった夏の日々。観終わったあと、ちょっとだけ優しい気持ちになる1本。" },
+  { emoji: "🕶️", kind: "タイムスリップ", yearDisp: "1984", dest: "1984年のロサンゼルス", memo: "現地メモ：未来から追跡者が来ている時代。電話帳で名前を探される側にならないように。夜のクラブは避けた方が無難。", mission: "🎁 お土産ミッション：「アイル・ビー・バック」と言わずに帰ってくること。", souvenir: "未来から来たサングラス", title: "ターミネーター", year: "1984年", services: "Hulu／U-NEXT／Amazonプライムビデオ", comment: "未来から送り込まれた追跡者と、1984年のロサンゼルス。ハラハラしたい夜に。" },
+  { emoji: "🏍️", kind: "タイムスリップ", yearDisp: "1995", dest: "1995年のロサンゼルス", memo: "現地メモ：今度の来訪者は守る側。バイクと大型トラックのカーチェイスが日常茶飯事。親指を立てて見送ろう。", mission: "🎁 お土産ミッション：溶鉱炉には近づかず、温かい場所で帰りを待つこと。", souvenir: "バイクのキーホルダー", title: "ターミネーター2", year: "1991年", services: "U-NEXT", comment: "今度は守る側として未来からやって来る。アクションも涙も、どっちも濃い1本。" },
+  { emoji: "☄️", kind: "タイムスリップ", yearDisp: "2013 ⇄ 2016", dest: "3年ずれた、もうひとつの町", memo: "現地メモ：起きたら入れ替わっている時代。スマホのメモと腕の落書きが命綱。彗星の夜は、たそがれ時を逃さないで。", mission: "🎁 お土産ミッション：相手の手のひらに、名前の代わりに大事な一言を書いてくること。", souvenir: "組紐のブレスレット", title: "君の名は。", year: "2016年", services: "Netflix／U-NEXT／Amazonプライムビデオ", comment: "入れ替わるふたりと、3年の時間差。観たあと、誰かに会いたくなる映画。" },
+  { emoji: "🚀", kind: "タイムスリップ", yearDisp: "20XX", dest: "時間がゆっくり流れる宇宙の果て", memo: "現地メモ：あちらの1時間は、地球の7年分。置いていく家族との時間の差が、この旅いちばんの荷物になる。", mission: "🎁 お土産ミッション：本棚の向こう側から、帰りの合図を送ること。", souvenir: "重力で歪んだ腕時計", title: "インターステラー", year: "2014年", services: "Hulu／U-NEXT／Amazonプライムビデオ", comment: "宇宙では時間の流れ方が違う。壮大だけど、最後に残るのは家族の話。元気な日にゆっくりと。" },
+  { emoji: "☕", kind: "タイムリープ", yearDisp: "同じ朝", dest: "同じ戦場の朝（エンドレス）", memo: "現地メモ：やられると朝に戻る、戦場のタイムループ。死ぬたびに少しずつ上手くなる。朝のコーヒーは何度でもおかわり自由（強制）。", mission: "🎁 お土産ミッション：ループを抜けるまで、同じ朝を何度でも生き抜くこと。", souvenir: "ループ仕様のコーヒー豆", title: "オール・ユー・ニード・イズ・キル", year: "2014年", services: "U-NEXT／Amazonプライムビデオ", comment: "死ぬたびに同じ朝に戻る、戦場のタイムループ。繰り返すたび強くなる、ゲームみたいな1本。" },
+  { emoji: "🚪", kind: "タイムリープ", yearDisp: "昨日", dest: "昨日の自分に会いに行く", memo: "現地メモ：移動できるのは自分の人生の中だけ。クローゼットが入口。やり直しの使い道は、ささやかな幸せのために。", mission: "🎁 お土産ミッション：大切な人との何気ない1日を、もう一度丁寧に過ごしてくること。", souvenir: "クローゼット型の小物入れ", title: "アバウト・タイム〜愛おしい時間について〜", year: "2013年", services: "U-NEXT／Amazonプライムビデオ", comment: "人生を少しだけ巻き戻せる青年と、愛おしい日常の話。ほっこりしたい夜に。" },
+  { emoji: "🔄", kind: "時間逆行", yearDisp: "◀◀ 逆行中", dest: "時間が逆向きに流れる戦場", memo: "現地メモ：弾丸は戻り、車は逆走する、時間逆行の世界。酸素マスクが目印。仕組みは「感じる」ものらしい。", mission: "🎁 お土産ミッション：逆行と順行の自分と、ぶつからないように帰ってくること。", souvenir: "逆向きに回るコイン", title: "TENET テネット", year: "2020年", services: "Hulu／U-NEXT／Amazonプライムビデオ", comment: "時間が逆行する世界で戦う、頭フル回転の1本。元気な日に、じっくり観るのがおすすめ。" },
+  { emoji: "🎻", kind: "タイムスリップ", yearDisp: "1985 ⇄ 2043", dest: "時代を行き来する追跡戦", memo: "現地メモ：行く先々で自分とすれ違う、パラドックス満載の旅。誰が誰だか分からなくなったら、この映画のせい。", mission: "🎁 お土産ミッション：自分自身と鉢合わせしないように帰ってくること。", souvenir: "バイオリンケースのミニチュア", title: "プレデスティネーション", year: "2014年", services: "Amazonプライムビデオ", comment: "時を巡る追跡と、とんでもないパラドックス。観終わったあと、もう一度最初から考えたくなる1本。" },
+  { emoji: "🦋", kind: "タイムリープ", yearDisp: "書き換わる過去", dest: "日記で書き換える、自分の過去", memo: "現地メモ：子供の頃の日記を読むと、その場面に戻れる旅。直したはずの過去が、別の形で歪むのがこの旅の怖いところ。", mission: "🎁 お土産ミッション：誰かを救うための書き換えは、慎重に。帰る頃には鼻血が出ていないか確認すること。", souvenir: "子どもの頃の日記帳", title: "バタフライ・エフェクト", year: "2004年", services: "日本では主要サービスで配信なし（2026年11月21日確認）。観るならDVDレンタル等で", comment: "小さな変更が、未来を大きく変えてしまう。タイムリープものの金字塔で、ラストの切なさが残る1本。" },
+  { emoji: "⏳", kind: "タイムリープ", yearDisp: "3時間前", dest: "逆転時計で戻る、ホグワーツの3時間", memo: "現地メモ：1回ひねると1時間戻る、小さな時計の旅。過去の自分と鉢合わせ厳禁。授業の掛け持ちにも使えるらしい。", mission: "🎁 お土産ミッション：無実の生き物と、友達のピンチを、両方救って帰ってくること。", souvenir: "逆転時計のレプリカ", title: "ハリー・ポッターとアズカバンの囚人", year: "2004年", services: "観る前に各サービスで確認してね", comment: "シリーズの中でも時間ものとして特別な1本。後半の「さっきの場面の裏側」が気持ちいい。" },
+  { emoji: "🧤", kind: "タイムスリップ", yearDisp: "2012 ⇄ 2023", dest: "過去へ潜る、最後の作戦", memo: "現地メモ：失くしたものを取り戻すための、時間泥棒作戦。過去の自分に会ったら、頭を狙わせないように。", mission: "🎁 お土産ミッション：指パッチンの前に、みんなで帰ってくること。", souvenir: "小さなガントレットの模型", title: "アベンジャーズ／エンドゲーム", year: "2019年", services: "観る前に各サービスで確認してね", comment: "11年分の物語の締めくくりと、過去への大作戦。長いけど、それだけの重みがある1本。" },
+  { emoji: "🌧️", kind: "タイムスリップ", yearDisp: "2044 ⇄ 2074", dest: "未来から自分が送られてくる時代", memo: "現地メモ：未来の犯罪組織が、消したい人間を過去へ送る時代。標的が自分自身だったら、さあ大変。", mission: "🎁 お土産ミッション：未来の自分と決着をつけて、雨の日に帰ってくること。", souvenir: "未来から届いた銀のミニチュア", title: "ルーパー", year: "2012年", services: "観る前に各サービスで確認してね", comment: "若い自分と老いた自分が対峙する、渋い時間SF。ブルース・ウィリスの存在感が効いている。" },
+  { emoji: "🦕", kind: "タイムスリップ", yearDisp: "白亜紀", dest: "タイムマシンで行く白亜紀", memo: "現地メモ：引き出しが入口のタイムマシン旅。恐竜の時代は暑くて広い。卵の持ち帰りには責任を持つこと。", mission: "🎁 お土産ミッション：小さな恐竜と友達になって、元気で帰ってくること。", souvenir: "恐竜の卵の化石レプリカ", title: "映画ドラえもん のび太の恐竜", year: "1980年", services: "観る前に各サービスで確認してね", comment: "タイムマシン映画の原点のひとつ。ピースケとの友情に、今観ても泣けるやつ。" },
+  { emoji: "🚙", kind: "タイムスリップ", yearDisp: "戦国時代", dest: "ジープで乗り込む戦国時代", memo: "現地メモ：現代の装備ごと戦国時代に放り込まれる旅。ヘリも戦車も、燃料が尽きたらただの鉄の箱。歴史が変わる音がする。", mission: "🎁 お土産ミッション：天下統一の邪魔はせず、無事に帰ってくること。", souvenir: "ジープのミニカー", title: "戦国自衛隊", year: "1979年", services: "観る前に各サービスで確認してね", comment: "自衛隊が丸ごと戦国時代へ。千葉真一のアクションと、歴史が暴走する面白さ。角川映画の勢いが詰まった1本。" },
+  { emoji: "🐒", kind: "タイムスリップ", yearDisp: "2035 ⇄ 1996", dest: "2035年から1996年への調査旅行", memo: "現地メモ：ウイルスで人類が地下に潜った未来からの調査旅行。情報は断片的、本人の記憶もあやふや。それでも行くしかない。", mission: "🎁 お土産ミッション：空港で、あの場面の本当の意味に気づいて帰ってくること。", souvenir: "空港の搭乗券の半券", title: "12モンキーズ", year: "1995年", services: "観る前に各サービスで確認してね", comment: "テリー・ギリアムの歪んだ世界観と、ブラッド・ピットの怪演。ラストで輪が閉じる感覚が忘れられない1本。" },
+  { emoji: "🗼", kind: "タイムスリップ", yearDisp: "1920年代", dest: "1920年代のパリ", memo: "現地メモ：夜中の12時に鐘が鳴ったら、古いプジョーが迎えに来る時代。芸術家たちのサロンに紛れ込める、ロマンチックな旅。", mission: "🎁 お土産ミッション：憧れの作家に会って、一言だけ話して帰ってくること。", souvenir: "1920年代パリのカフェのマッチ箱", title: "ミッドナイト・イン・パリ", year: "2011年", services: "観る前に各サービスで確認してね", comment: "ヘミングウェイやピカソがいる黄金時代のパリへ。ウディ・アレンの、懐かしさへの皮肉と愛が詰まった1本。" },
+  { emoji: "🦫", kind: "タイムリープ", yearDisp: "2月2日（永遠）", dest: "終わらない2月2日", memo: "現地メモ：目覚まし時計は毎朝6時、流れる曲も同じ。雪の小さな町で、同じ日を何百回も生きる旅。脱出の鍵は、人のためになることらしい。", mission: "🎁 お土産ミッション：同じ1日の中で、誰かを幸せにして帰ってくること。", souvenir: "グラウンドホッグのぬいぐるみ", title: "恋はデジャ・ブ", year: "1993年", services: "観る前に各サービスで確認してね", comment: "タイムループ映画の元祖にして最高峰。ビル・マーレイの変化が、笑えて最後は温かい。" },
+  { emoji: "🎂", kind: "タイムリープ", yearDisp: "誕生日（永遠）", dest: "殺される誕生日のループ", memo: "現地メモ：誕生日の夜に殺されて、朝に戻る旅。犯人はベビーフェイスのマスク。死ぬたびに、少しずつ手がかりは増えていく。", mission: "🎁 お土産ミッション：犯人を見つけて、ケーキのろうそくを吹き消して帰ってくること。", souvenir: "ベビーフェイスのミニマスク", title: "ハッピー・デス・デイ", year: "2017年", services: "観る前に各サービスで確認してね", comment: "ホラー×タイムループの痛快作。怖さより爽快感が勝つ、誕生日の大逆転。" },
+  { emoji: "🚆", kind: "タイムリープ", yearDisp: "8分前", dest: "爆発8分前の列車", memo: "現地メモ：他人の体で、爆発直前の列車に乗り込む8分間の旅。戻るたびに、少しずつ真相に近づく。窓の外の景色が鍵になる。", mission: "🎁 お土産ミッション：8分の中で、できる限りの人を救って帰ってくること。", souvenir: "8分間だけ有効な列車の切符", title: "ミッション：8ミニッツ", year: "2011年", services: "観る前に各サービスで確認してね", comment: "8分という制限が効いた、切ないSFサスペンス。短いループなのに、感情の密度が高い1本。" },
+  { emoji: "📚", kind: "タイムスリップ", yearDisp: "12月18日", dest: "変わってしまった12月18日", memo: "現地メモ：朝起きたら、世界が少しだけ違う12月18日。騒がしいあの子が、おとなしい文学少女になっている。元に戻す鍵は、3年前の七夕にある。", mission: "🎁 お土産ミッション：プログラムキーを手に入れて、自分の世界を選んで帰ってくること。", souvenir: "図書室の栞（しおり）", title: "涼宮ハルヒの消失", year: "2010年", services: "観る前に各サービスで確認してね", comment: "長門有希の物語として語り継がれる劇場版。静かで切ない、冬に観たい1本。" },
+  { emoji: "🥤", kind: "タイムスリップ", yearDisp: "世界線変動率 . . .", dest: "世界線を跳ぶ秋葉原", memo: "現地メモ：秋葉原のラボから、世界線を跳び越える旅。ダイバージェンスメーターの数値が、世界の違いを教えてくれる。跳びすぎると、体が覚えている。", mission: "🎁 お土産ミッション：誰も傷つかない世界線を、一つだけ見つけて帰ってくること。", souvenir: "ダイバージェンスメーターの模型", title: "STEINS;GATE 負荷領域のデジャヴ", year: "2013年", services: "観る前に各サービスで確認してね", comment: "TVシリーズの先を描く劇場版。今度は救う側と救われる側が入れ替わる、ファン必見の1本。エル・プサイ・コングルゥ。" },
+  { emoji: "☎️", kind: "タイムスリップ", yearDisp: "1989", dest: "電話ボックスでめぐる歴史の旅", memo: "現地メモ：電話ボックス型タイムマシンで、歴史上の有名人を集めに行く旅。ナポレオンもソクラテスも、みんなで宿題をやっつけよう。", mission: "🎁 お土産ミッション：歴史上の人物をひとり、現代に連れて帰ってくること（ただし宿題は手伝ってもらう）。", souvenir: "電話ボックスの受話器キーホルダー", title: "ビルとテッドの大冒険", year: "1989年", services: "観る前に各サービスで確認してね", comment: "何も考えずに笑える、軽さの王様。落ちてる日にこそ、こういう脳みそ休憩系がちょうどいい1本。" },
+  { emoji: "🌳", kind: "タイムスリップ", yearDisp: "未来", dest: "未来から来た妹と会う横浜", memo: "現地メモ：未来からやってきた妹・ミライちゃんと、家の庭の不思議な木をくぐって家族の昔をめぐる旅。", mission: "🎁 お土産ミッション：家族の誰かの「昔の話」をひとつ、聞いて帰ってくること。", souvenir: "庭の木の葉の標本", title: "未来のミライ", year: "2018年", services: "観る前に各サービスで確認してね", comment: "細田守監督の、家族の時間をめぐる優しい1本。ほっこりした気持ちになれるよ。" },
+  { emoji: "📻", kind: "タイムスリップ", yearDisp: "1969", dest: "無線でつながる30年前の父", memo: "現地メモ：オーロラの夜、古い無線機が30年前の父とつながる。過去を変えたら、今はどうなる？", mission: "🎁 お土産ミッション：30年前の誰かに「ありがとう」を、無線でひとこと届けて帰ってくること。", souvenir: "古い無線機のダイヤル", title: "オーロラの彼方へ", year: "2000年", services: "観る前に各サービスで確認してね", comment: "父と子の時間を超えた絆の物語。切ないけど、最後はじんわり温かい1本。" },
+  { emoji: "🏰", kind: "タイムスリップ", yearDisp: "1357", dest: "1357年のフランス", memo: "現地メモ：中世フランスの城と村へ。タイムマシンで送り込まれた考古学者チームを追って、騎士の時代を歩く。", mission: "🎁 お土産ミッション：中世のパンかチーズをひとつ、味見して帰ってくること。", souvenir: "中世の紋章入りコイン", title: "タイムライン", year: "2003年", services: "観る前に各サービスで確認してね", comment: "マイケル・クライトン原作の、歴史の中に飛び込む冒険もの。城攻めの迫力がすごいよ。" },
+  { emoji: "🎓", kind: "タイムリープ", yearDisp: "1960", dest: "高校時代に戻った同窓会の夜", memo: "現地メモ：同窓会の夜に気を失ったら、高校時代に戻っていた。人生をやり直せるなら、どこを変える？", mission: "🎁 お土産ミッション：高校時代の自分に、ひと言だけアドバイスして帰ってくること。", souvenir: "高校の卒業アルバム（縮刷版）", title: "ペギー・スーの結婚", year: "1986年", services: "観る前に各サービスで確認してね", comment: "フランシス・フォード・コッポラ監督の、人生リープもの。懐かしさと切なさが同居する1本。" },
+  { emoji: "🎼", kind: "タイムスリップ", yearDisp: "1912", dest: "1912年のグランドホテル", memo: "現地メモ：催眠術で100年前に戻る、ロマンチックな旅。昔の衣装を着て、湖畔のホテルで過ごす数日間。", mission: "🎁 お土産ミッション：1912年の景色を、絵はがきに描いて帰ってくること。", souvenir: "1912年の絵はがき", title: "ある日どこかで", year: "1980年", services: "観る前に各サービスで確認してね", comment: "時を超えた恋の名作。音楽がとにかく美しくて、静かに心に残る1本。" },
+  { emoji: "🌸", kind: "タイムスリップ", yearDisp: "802701", dest: "西暦802,701年の未来", memo: "現地メモ：人類がふたつの種族に分かれた、はるか未来の地球。地下に住むモーロックに気をつけて。", mission: "🎁 お土産ミッション：未来の花を一輪だけ、そっと持ち帰ること。", souvenir: "未来の花の押し花", title: "タイムマシン", year: "2002年", services: "観る前に各サービスで確認してね", comment: "H・G・ウェルズの古典を、未来の果てまで描いた冒険もの。SFの原点に触れる1本。" },
+  { emoji: "🎆", kind: "タイムリープ", yearDisp: "夏祭り", dest: "夏祭りの日を繰り返す町", memo: "現地メモ：打ち上げ花火の見え方が変わる、夏の1日を何度も繰り返す旅。「もしも」が、少しずつ世界を変えていく。", mission: "🎁 お土産ミッション：花火の見え方がいちばん綺麗な場所を、ひとつ見つけて帰ってくること。", souvenir: "花火の形のガラス玉", title: "打ち上げ花火、下から見るか？横から見るか？", year: "2017年", services: "観る前に各サービスで確認してね", comment: "新房昭之監督×岩井俊二原作の、夏の「もしも」を描くアニメ。花火のシーンがきれいだよ。" },
+];
+
+const specialMissions = [
+  "⭐ スペシャルミッション：現地の人と友達になって帰ること。",
+  "⭐ スペシャルミッション：その時代の名物を食べてくること。",
+  "⭐ スペシャルミッション：現地の言葉で「ありがとう」を言ってくること。",
+  "⭐ スペシャルミッション：その時代の流行をひとつ真似して帰ること。",
+  "⭐ スペシャルミッション：現地で写真を1枚撮ってくること（心のシャッターでも可）。",
+  "⭐ スペシャルミッション：誰かの落とし物を拾って、届けて帰ること。",
+  "⭐ スペシャルミッション：現地の子どもに、今の時代の遊びを教えてくること。",
+  "⭐ スペシャルミッション：夕日が沈む前に、現地の景色を目に焼き付けて帰ること。",
+  "⭐ スペシャルミッション：現地の人に「いい時代だね」と言ってもらうこと。",
+  "⭐ スペシャルミッション：お土産話をひとつ作って帰ること。誇張は少しだけOK。"
+];
+
+let lastIndex = -1;
+
+// ===== コレクション帳（localStorageに保存） =====
+const COLLECTION_KEY = "time-slip-ticket-collection-v1";
+let collection = [];
+try {
+  const saved = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "[]");
+  if (Array.isArray(saved)) {
+    collection = saved.filter(function (n) { return Number.isInteger(n) && n >= 0 && n < trips.length; });
+  }
+} catch (e) { collection = []; }
+// ===== お土産棚（localStorageに保存） =====
+const SOUVENIR_KEY = "time-slip-ticket-souvenirs-v1";
+let souvenirs = [];
+try {
+  const savedS = JSON.parse(localStorage.getItem(SOUVENIR_KEY) || "[]");
+  if (Array.isArray(savedS)) {
+    souvenirs = savedS.filter(function (n) { return Number.isInteger(n) && n >= 0 && n < trips.length; });
+  }
+} catch (e) { souvenirs = []; }
+
+const STAMP_COLORS = ["#f0c979", "#a8d5a2", "#f2a9c4", "#9ec7e8", "#d3b8e8", "#f5b183"];
+
+function renderSouvenirs() {
+  const list = document.getElementById("souvenirList");
+  let html = "";
+  trips.forEach(function (t, idx) {
+    if (souvenirs.indexOf(idx) >= 0) {
+      html += '<li class="stamp got"><span class="stamp-circle" style="border-color:' + STAMP_COLORS[idx % STAMP_COLORS.length] + '">' + t.emoji + '</span><span class="stamp-name">' + t.souvenir + '</span></li>';
+    } else {
+      html += '<li class="stamp miss"><span class="stamp-circle">？</span><span class="stamp-name">？？？</span></li>';
+    }
+  });
+  list.innerHTML = html;
+  const remain = trips.length - souvenirs.length;
+  document.getElementById("souvenirProgress").textContent = remain === 0
+    ? "🎉 お土産も全" + trips.length + "種類コンプリート！すごい！"
+    : "集まったお土産：" + souvenirs.length + "／" + trips.length + "種類（あと" + remain + "種類でコンプリート）";
+}
+
+
+function renderCollection() {
+  const list = document.getElementById("collectionList");
+  let html = "";
+  trips.forEach(function (t, idx) {
+    if (collection.indexOf(idx) >= 0) {
+      html += '<li class="stamp got"><span class="stamp-circle" style="border-color:' + STAMP_COLORS[idx % STAMP_COLORS.length] + '">' + t.emoji + '</span><span class="stamp-name">' + t.dest + '</span></li>';
+    } else {
+      html += '<li class="stamp miss"><span class="stamp-circle">？</span><span class="stamp-name">？？？</span></li>';
+    }
+  });
+  list.innerHTML = html;
+  const remain = trips.length - collection.length;
+  document.getElementById("collectionProgress").textContent = remain === 0
+    ? "🎉 全" + trips.length + "か所コンプリート！すごい！"
+    : "集まったきっぷ：" + collection.length + "／" + trips.length + "か所（あと" + remain + "か所でコンプリート）";
+}
+
+// ===== 旅の記録（このページを開いている間だけ） =====
+let travelCount = 0;
+function recordTrip(i, t, viaAccident) {
+  if (collection.indexOf(i) < 0) {
+    collection.push(i);
+    try { localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection)); } catch (e) {}
+  }
+  if (souvenirs.indexOf(i) < 0) {
+    souvenirs.push(i);
+    try { localStorage.setItem(SOUVENIR_KEY, JSON.stringify(souvenirs)); } catch (e) {}
+  }
+  renderCollection();
+  renderSouvenirs();
+  travelCount++;
+  const empty = document.getElementById("travelLogEmpty");
+  if (empty) empty.style.display = "none";
+  const li = document.createElement("li");
+  li.textContent = travelCount + "回目：" + t.dest + "（" + t.title + "）" + (viaAccident ? "（アクシデントで変更）" : "");
+  document.getElementById("travelLog").appendChild(li);
+}
+
+// ===== タブ切り替え =====
+const tabTicketBtn = document.getElementById("tabTicket");
+const tabCollectionBtn = document.getElementById("tabCollection");
+function switchTab(which) {
+  const isTicket = which === "ticket";
+  document.getElementById("tabTicketView").style.display = isTicket ? "block" : "none";
+  document.getElementById("tabCollectionView").style.display = isTicket ? "none" : "block";
+  tabTicketBtn.classList.toggle("active", isTicket);
+  tabCollectionBtn.classList.toggle("active", !isTicket);
+}
+tabTicketBtn.addEventListener("click", function () { switchTab("ticket"); });
+tabCollectionBtn.addEventListener("click", function () { switchTab("collection"); });
+
+document.getElementById("collectionReset").addEventListener("click", function () {
+  if (!confirm("コレクションとお土産を全部消して、最初から集め直す？")) return;
+  collection = [];
+  souvenirs = [];
+  try { localStorage.removeItem(COLLECTION_KEY); } catch (e) {}
+  try { localStorage.removeItem(SOUVENIR_KEY); } catch (e) {}
+  renderCollection();
+  renderSouvenirs();
+});
+
+renderCollection();
+renderSouvenirs();
+
+const btn = document.getElementById("draw");
+function showResult(i, t, origDest) {
+  btn.disabled = false;
+  const card = document.getElementById("card");
+  let specialHtml = '';
+  if (Math.random() < 0.5) {
+    specialHtml = '<div class="mission special">' + specialMissions[Math.floor(Math.random() * specialMissions.length)] + '</div>';
+  }
+  const accidentHtml = origDest
+    ? '<div class="accident">⚡ アクシデント発生！タイムサーキットがショートして、行き先が当初の「' + origDest + '」からズレちゃった。予定外の場所に着地するよ！</div>'
+    : '';
+  card.innerHTML =
+    '<div class="slip">あなたは今からタイムスリップします</div>' +
+    accidentHtml +
+    '<div><span class="kind">' + t.kind + '</span></div>' +
+    '<div class="result-stamp" style="border-color:' + STAMP_COLORS[i % STAMP_COLORS.length] + '">' + t.emoji + '</div>' +
+    '<div class="dest">🕰️ ' + t.dest + '</div>' +
+    '<div class="circuit-label">DESTINATION TIME</div><div class="circuit">' + t.yearDisp + '</div>' +
+    '<div class="memo">' + t.memo + '</div>' +
+    '<div class="mission">' + t.mission + '</div>' +
+    specialHtml +
+    '<div class="souvenir-get">🎁 お土産を手に入れた：' + t.souvenir + '（お土産棚にしまったよ）</div>' +
+    '<div class="film">' +
+    '<div class="filmtitle">🎬 その時代の映画：' + t.title + '</div>' +
+    '<div class="year">' + t.year + '</div>' +
+    '<div class="services">📺 見放題：' + t.services + '</div>' +
+    '<div class="comment">' + t.comment + '</div></div>';
+  recordTrip(i, t, !!origDest);
+}
+
+btn.addEventListener("click", function () {
+  let i;
+  do { i = Math.floor(Math.random() * trips.length); } while (i === lastIndex && trips.length > 1);
+  lastIndex = i;
+  const t = trips[i];
+  btn.disabled = true;
+  const card = document.getElementById("card");
+  card.innerHTML = '<div class="slip">タイムサーキット始動…</div><div class="circuit-label">DESTINATION TIME</div><div class="circuit" id="spin">----</div><div class="comment" style="text-align:center;">行き先の年代を設定中</div>';
+  let delay = 60;
+  function spinStep() {
+    const el = document.getElementById("spin");
+    if (!el) return;
+    el.textContent = String(1880 + Math.floor(Math.random() * 221));
+    delay = delay * 1.22;
+    if (delay < 340) {
+      setTimeout(spinStep, delay);
+    } else {
+      el.textContent = t.yearDisp;
+      setTimeout(function () {
+      if (Math.random() < 0.12) {
+        // ⚡ アクシデント（約12%）：行き先が別の場所にズレる
+        card.innerHTML = '<div class="slip">⚡ タイムサーキットがショートした！</div><div class="circuit">⚠ ERROR ⚠</div><div class="comment" style="text-align:center;">行き先がズレています…着地先を再計算中</div>';
+        setTimeout(function () {
+          let j;
+          do { j = Math.floor(Math.random() * trips.length); } while (j === i && trips.length > 1);
+          lastIndex = j;
+          showResult(j, trips[j], t.dest);
+        }, 1100);
+      } else {
+        showResult(i, t, null);
+      }
+      }, 650);
+    }
+  }
+  setTimeout(spinStep, delay);
+});
+</script>
+</body>
+</html>
