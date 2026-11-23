@@ -14,19 +14,19 @@
 <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.1.0/color/618x618/1F3AB.png">
 <style>
   body { font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif; background: #fdf6ec; color: #4a3f35; text-align: center; padding: 24px 16px; margin: 0; }
-  h1 { font-size: 1.5em; margin: 8px 0 4px; }
+  h1 { font-size: clamp(1.18rem, 6.2vw, 1.5rem); margin: 8px 0 4px; line-height: 1.35; word-break: keep-all; }
   .sub { font-size: 0.9em; color: #8a7a68; margin-bottom: 20px; }
   .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 480px; margin: 0 auto; padding: 24px 20px; min-height: 260px; }
   .slip { font-size: 1.05em; color: #b7793f; font-weight: bold; margin-bottom: 6px; }
-  .circuit { font-family: "Courier New", monospace; background: #1a1a1a; color: #ff5a3c; border-radius: 10px; padding: 12px 8px; font-size: 2em; font-weight: bold; letter-spacing: 0.12em; margin: 10px 0 4px; text-shadow: 0 0 8px rgba(255,90,60,0.7); }
+  .circuit { font-family: "Courier New", monospace; background: #1a1a1a; color: #ff5a3c; border-radius: 10px; padding: 12px 8px; font-size: clamp(1.3rem, 9vw, 2rem); font-weight: bold; letter-spacing: 0.12em; margin: 10px 0 4px; text-shadow: 0 0 8px rgba(255,90,60,0.7); }
   .circuit-label { font-size: 0.72em; color: #8a7a68; letter-spacing: 0.3em; margin-bottom: 2px; }
-  .dest { font-size: 1.45em; font-weight: bold; margin: 6px 0; line-height: 1.4; }
+  .dest { font-size: clamp(1.12rem, 5.6vw, 1.45rem); font-weight: bold; margin: 6px 0; line-height: 1.4; word-break: keep-all; overflow-wrap: break-word; }
   .kind { display: inline-block; font-size: 0.78em; background: #d9a441; color: #fff; border-radius: 999px; padding: 2px 10px; margin-bottom: 6px; }
   .memo { font-size: 0.98em; line-height: 1.7; text-align: left; background: #fff8e6; border-radius: 10px; padding: 10px 12px; margin: 12px 0; }
   .mission { font-size: 0.95em; line-height: 1.7; text-align: left; background: #eef7ee; border-radius: 10px; padding: 10px 12px; margin: 12px 0; }
   .mission.special { background: #fdf3d7; border: 1px dashed #d9a441; }
   .film { margin-top: 14px; border-top: 1px dashed #d9c9a8; padding-top: 12px; }
-  .filmtitle { font-size: 1.15em; font-weight: bold; }
+  .filmtitle { font-size: clamp(1.02rem, 5vw, 1.15rem); font-weight: bold; word-break: keep-all; overflow-wrap: break-word; }
   .year { color: #8a7a68; font-size: 0.9em; }
   .services { margin: 10px 0; font-size: 0.92em; background: #fdf6ec; border-radius: 10px; padding: 8px; }
   .comment { font-size: 0.95em; line-height: 1.7; text-align: left; }
@@ -59,9 +59,19 @@
   .stamp { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 5px; }
   .stamp-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.85em; background: #fff8e6; border: 3px solid #f0c979; box-shadow: inset 0 0 0 3px #fff, 0 1px 4px rgba(0,0,0,0.08); box-sizing: border-box; }
   .stamp.miss .stamp-circle { background: #f4f0ea; border-color: #ddd3c2; color: #c4b49c; font-size: 1.35em; }
-  .stamp-name { font-size: 0.72em; line-height: 1.35; color: #4a3f35; word-break: break-all; }
+  .stamp-name { font-size: 0.72em; line-height: 1.35; color: #4a3f35; word-break: keep-all; overflow-wrap: anywhere; }
   .stamp.miss .stamp-name { color: #c4b49c; }
   .result-stamp { width: 74px; height: 74px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.3em; background: #fff8e6; border: 3.5px solid #f0c979; box-shadow: inset 0 0 0 3.5px #fff, 0 2px 6px rgba(0,0,0,0.1); margin: 2px auto 8px; box-sizing: border-box; }
+
+  @media (max-width: 380px) {
+    body { padding: 16px 10px; }
+    .card { padding: 18px 14px; }
+    .stamp-grid { gap: 12px 4px; }
+    .stamp-circle { width: 52px; height: 52px; font-size: 1.6em; }
+    .result-stamp { width: 64px; height: 64px; font-size: 2em; }
+    button { padding: 12px 22px; font-size: 1em; }
+    .tab-btn { padding: 9px 10px; font-size: 0.95em; }
+  }
 </style>
 </head>
 <body>
