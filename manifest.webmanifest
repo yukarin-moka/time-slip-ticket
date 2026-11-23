@@ -1,0 +1,18 @@
+{
+  "name": "タイムスリップ行き先きっぷ",
+  "short_name": "行き先きっぷ",
+  "description": "ボタンを押すと年代がスロット式に回って、タイムスリップの行き先が決まる遊び道具",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#fdf6ec",
+  "theme_color": "#fdf6ec",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.1.0/color/618x618/1F3AB.png",
+      "sizes": "618x618",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
